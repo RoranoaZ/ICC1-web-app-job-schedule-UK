@@ -1,21 +1,19 @@
 import os
-from urllib.parse import quote_plus
 
 class Config:
+    # Secret key for Flask sessions and CSRF protection
+    # IMPORTANT: In a production environment, this should be a strong, randomly generated string
+    # and ideally loaded from an environment variable or a secure secret management system.
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess-this-secret-key-for-development'
 
-    database_url = os.environ.get('DATABASE_URL')
-
-    if database_url:
-        SQLALCHEMY_DATABASE_URI = database_url
-    else:
-        # Local fallback for dev
-        username = os.environ.get('DB_USER', 'postgres')
-        password = os.environ.get('DB_PASS', 'password123')
-        server = os.environ.get('DB_SERVER', 'localhost')
-        database = os.environ.get('DB_NAME', 'mydb')
-
-        password_encoded = quote_plus(password)
-        SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{username}:{password_encoded}@{server}:5432/{database}"
-
+    # Database configuration
+    # This environment variable will determine which database is used.
+    # Examples:
+    # 1. SQLite (monolith): SQLALCHEMY_DATABASE_URI='sqlite:///site.db'
+    # 2. PostgreSQL: SQLALCHEMY_DATABASE_URI='postgresql://user:password@host:port/database_name'
+    # 3. Azure Cosmos DB (PostgreSQL API): SQLALCHEMY_DATABASE_URI='postgresql://user:password@host:port/database_name'
+    #    (Note: The connection string for Cosmos DB's PostgreSQL API will look like a standard PostgreSQL string)
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///site.db'
+    
+    # Disable SQLAlchemy event system to save memory, as we don't need it for this simple app
     SQLALCHEMY_TRACK_MODIFICATIONS = False
